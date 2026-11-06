@@ -374,3 +374,77 @@ footer { display: flex; justify-content: space-between; gap: 15px; flex-wrap: wr
   .skill-expand { grid-column:3; grid-row:1/3; }.skill-detail { padding:16px; gap:20px; }.skill-name { font-size:14px; }
   .skill-controls { align-items:stretch; }.skill-actions { width:100%; }.skill-actions .button { flex:1; }.skill-actions .danger-outline { flex-basis:100%; }
 }
+
+/* Overview: usage leads; the wiring map reflects configured routes, not packet capture. */
+#page-overview>.usage-panel { background:#191c17; color:#fff; padding:28px; box-shadow:5px 5px 0 #b8c49f; margin:8px 0 36px; }
+#page-overview>.usage-panel .eyebrow { color:#c4d0b4; }
+#page-overview>.usage-panel h2 { font-size:24px; letter-spacing:-.04em; }
+#page-overview .usage-controls .input { width:130px; min-height:44px; background:#292d24; color:#fff; border-color:#737d66; }
+#page-overview .usage-controls .icon-button { width:44px; height:44px; background:#292d24; color:#fff; border-color:#737d66; }
+#page-overview .usage-metrics { grid-template-columns:1.1fr 1fr 1.15fr .65fr; gap:0; padding-top:12px; }
+#page-overview .usage-metric { border-color:#535b49; padding:12px 20px; }
+#page-overview .usage-metric:first-child { padding-left:0; }
+#page-overview .usage-metric>span { color:#d6dbcd; font-size:13px; }
+#page-overview .usage-metric strong { font-size:clamp(27px,3.2vw,44px); letter-spacing:-.055em; line-height:1.2; margin-top:12px; }
+#page-overview .usage-metric:first-child strong { color:#dcebbd; }
+#page-overview .usage-rupiah strong { font-size:clamp(25px,2.8vw,38px); }
+#page-overview .usage-metric small { color:#bdc5b2; font-size:12px; line-height:1.6; margin-top:12px; }
+#page-overview .usage-breakdown { margin-top:28px; }
+#page-overview .usage-breakdown-head,#page-overview .usage-foot { color:#d6dbcd; font-size:11px; }
+#page-overview .usage-track { border-color:#707d5e; background:#272b22; height:8px; }
+#page-overview #usage-input-bar { background:#e6f1d4; }#page-overview #usage-output-bar { background:#80975f; }
+#page-overview .usage-foot { border-color:#4e5842; gap:12px; }
+#usage-note { max-width:650px; }
+.usage-sources { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin-top:24px; padding-top:20px; border-top:1px solid #4e5842; }
+.usage-sources>div { min-width:0; }.usage-sources span { display:block; color:#c7d0bc; font-size:12px; }
+.usage-sources b { display:block; font-size:14px; font-weight:650; margin:5px 0; }
+.usage-sources small { color:#bdc5b2; font-size:11px; line-height:1.6; display:block; }
+.usage-fx-source { font-size:11px; margin:20px 0 0; color:#bdc5b2; }
+.usage-fx-source a { text-underline-offset:3px; }
+#page-overview .hero-row { padding-top:0; }
+#page-overview .hero h2 { font-size:clamp(30px,3.7vw,46px); }
+#page-overview .stat-grid { grid-template-columns:repeat(3,minmax(0,1fr)); margin:24px 0; }
+#page-overview .content-grid { grid-template-columns:minmax(0,1fr); }
+.network-panel { padding:24px; margin:8px 0 24px; }
+.network-panel .panel-heading { gap:16px; flex-wrap:wrap; }.network-panel .panel-heading p { font-size:13px; margin:8px 0 0; }
+.network-legend { color:var(--muted); font-size:11px; max-width:220px; display:flex; align-items:center; gap:8px; }
+.network-legend i { display:block; width:8px; height:8px; border-radius:50%; background:#587840; flex-shrink:0; }
+.network-map { position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); isolation:isolate; margin-top:16px; }
+.network-wires { position:absolute; width:100%; height:180px; inset:0; z-index:-1; overflow:visible; }
+.network-node { display:flex; flex-direction:column; align-items:center; min-width:0; text-align:center; padding:24px 12px 20px; }
+.network-tool-icon { width:80px; height:80px; display:grid; place-items:center; border:2px solid var(--line); background:var(--panel); box-shadow:4px 4px 0 #d5d9cb; }
+.network-tool-icon svg { width:48px; height:48px; }.router-node .network-tool-icon { background:var(--ink); color:white; }
+.network-node h3 { font-size:16px; margin:16px 0 8px; }.network-node>b { font:600 13px/1.6 ui-monospace,monospace; overflow-wrap:anywhere; max-width:100%; margin-top:12px; }
+.network-node small { display:block; color:var(--muted); font-size:11px; margin-top:6px; max-width:100%; overflow-wrap:anywhere; }
+.network-state { font-size:11px; color:#8d4537; }.network-state.online { color:#48653b; }
+.network-state::before { content:'○'; margin-right:5px; }.network-state.online::before { content:'●'; }
+.wire path { fill:none; stroke-width:3; }.wire-base { stroke:#a0b18a; display:none; }.wire-energy { stroke:#41642a; stroke-dasharray:12 25; display:none; }
+.wire.connected .wire-base,.wire.connected .wire-energy { display:block; }.wire.connected .wire-energy { animation:wire-flow 1.8s linear infinite; }
+.wire-broken { stroke:#a59e98; stroke-dasharray:5 5; }.wire-spark { stroke:#9b5540; animation:wire-unplug 3s ease-in-out infinite; transform-origin:center; }
+.wire.connected .wire-broken,.wire.connected .wire-spark { display:none; }
+.network-caption { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; padding-top:16px; border-top:1px solid var(--soft); font-size:12px; color:var(--muted); }
+.network-panel.paused .wire-energy,.network-panel.paused .wire-spark { animation-play-state:paused; }
+@keyframes wire-flow { to { stroke-dashoffset:-74; } }
+@keyframes wire-unplug { 50% { opacity:.35; transform:translateY(2px); } }
+@media(max-width:1100px) {
+  #page-overview .usage-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 0; }
+  #page-overview .usage-metric:nth-child(3) { padding-left:0; border-left:0; }
+}
+@media(max-width:600px) {
+  #page-overview>.usage-panel { padding:20px; margin-bottom:28px; }#page-overview .usage-metric { border:0; padding:12px 0; }
+  #page-overview .usage-metrics { grid-template-columns:minmax(0,1fr); gap:0; }#page-overview .usage-metric { border-bottom:1px solid #4e5842; }
+  #page-overview .usage-metric strong,#page-overview .usage-rupiah strong { font-size:38px; }
+  .usage-sources { grid-template-columns:minmax(0,1fr); gap:20px; }.network-panel { padding:16px; }
+  .network-node { padding:16px 5px; }.network-tool-icon { width:56px; height:56px; box-shadow:3px 3px 0 #d5d9cb; }.network-tool-icon svg { width:34px; height:34px; }
+  .network-wires { height:124px; }.network-node h3 { font-size:13px; }.network-node>b { font-size:11px; }.network-node small { font-size:10px; }
+  .network-state { font-size:10px; }#page-overview .stat-grid { grid-template-columns:minmax(0,1fr); }
+}
+@media(prefers-reduced-motion:reduce) { .wire-energy,.wire-spark { animation:none !important; } }
+
+@media(max-width:600px) {
+  #page-overview .usage-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #page-overview .usage-metric strong { font-size:30px; }
+  #page-overview .usage-metric:nth-child(2) { padding-left:12px; border-left:1px solid #4e5842; }
+  #page-overview .usage-rupiah,#page-overview .usage-metric:last-child { grid-column:1/-1; }
+  #page-overview .usage-rupiah strong { font-size:36px; }
+}

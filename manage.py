@@ -16,7 +16,7 @@ import urllib.request
 
 REPO = Path(__file__).resolve().parent
 RUNTIME_FILES = ('app.py', 'app.js', 'index.html', 'style.css', 'settings.py', 'updates.py',
-                 'privacy_policy.py', 'skill_manager.py', 'skills.js', 'opencode_web.py',
+                 'overview.py', 'privacy_policy.py', 'skill_manager.py', 'skills.js', 'opencode_web.py',
                  'opencode-web.html', 'opencode-web.js', 'opencode-web.css')
 ORIGIN = 'https://github.com/azlan07/Hermin.git'
 

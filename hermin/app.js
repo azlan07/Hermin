@@ -89,22 +89,53 @@ function renderPrivacy(security) {
 
 function renderUsage(usage) {
   const available = !!usage?.available;
-  const input = available ? Number(usage.prompt_tokens || 0) : 0;
-  const output = available ? Number(usage.completion_tokens || 0) : 0;
-  const total = input + output;
-  const compact = (value) => new Intl.NumberFormat('id-ID', {notation:'compact', maximumFractionDigits:1}).format(value);
-  const exact = (value) => new Intl.NumberFormat('id-ID').format(value);
-  const cost = available ? Number(usage.estimated_cost_usd || 0) : 0;
+  const input = Number(usage?.prompt_tokens || 0), output = Number(usage?.completion_tokens || 0), total = input + output;
+  const compact = value => new Intl.NumberFormat('id-ID', {notation:'compact', maximumFractionDigits:1}).format(value);
+  const exact = value => new Intl.NumberFormat('id-ID').format(value);
+  const usd = value => new Intl.NumberFormat('en-US', {style:'currency', currency:'USD', maximumFractionDigits:value > 0 && value < 0.01 ? 4 : 2}).format(value);
+  const cost = Number(usage?.estimated_cost_usd || 0), fx = usage?.fx;
   $('usage-tokens').textContent = available ? compact(total) : '—';
   $('usage-token-exact').textContent = available ? `${exact(total)} token input + output` : 'Statistik belum tersedia';
-  $('usage-cost').textContent = available ? new Intl.NumberFormat('en-US', {style:'currency', currency:'USD', minimumFractionDigits:2, maximumFractionDigits:cost > 0 && cost < 0.01 ? 4 : 2}).format(cost) : '—';
+  $('usage-cost').textContent = available ? usd(cost) : '—';
+  $('usage-idr').textContent = available && fx?.available ? new Intl.NumberFormat('id-ID', {style:'currency', currency:'IDR', maximumFractionDigits:0}).format(cost * fx.rate) : '—';
+  $('usage-fx').textContent = fx?.available ? `US$1 = Rp${exact(fx.rate)} · ${fx.date}${fx.stale ? ' · kurs terakhir' : ''}` : 'Kurs belum tersedia';
+  $('usage-fx-source').replaceChildren();
+  if (fx?.available) { const a = document.createElement('a'); a.href = 'https://frankfurter.dev/'; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = `Kurs referensi harian: ${fx.source}. Bukan kurs transaksi bank.`; $('usage-fx-source').append(a); }
   $('usage-requests').textContent = available ? exact(Number(usage.requests || 0)) : '—';
-  $('usage-input').textContent = available ? `Input ${compact(input)}` : 'Input —';
-  $('usage-output').textContent = available ? `Output ${compact(output)}` : 'Output —';
-  $('usage-input-bar').style.width = total ? `${input / total * 100}%` : '0%';
-  $('usage-output-bar').style.width = total ? `${output / total * 100}%` : '0%';
-  $('usage-top-model').textContent = available ? (usage.top_model || 'Belum ada') : '—';
-  $('usage-note').textContent = available ? 'Estimasi nilai API setara dari seluruh trafik 9Router; bukan tagihan.' : (usage?.error || 'Statistik belum tersedia.');
+  $('usage-input').textContent = `Input ${compact(input)}`; $('usage-output').textContent = `Output ${compact(output)}`;
+  $('usage-input-bar').style.width = total ? `${input / total * 100}%` : '0%'; $('usage-output-bar').style.width = total ? `${output / total * 100}%` : '0%';
+  $('usage-top-model').textContent = usage?.top_model || 'Belum ada';
+  $('usage-note').textContent = `${usage?.partial ? 'Cakupan sebagian. ' : ''}${usage?.note || 'Catatan lokal belum tersedia.'}`;
+  $('usage-sources').replaceChildren();
+  for (const source of usage?.sources || []) {
+    const card = document.createElement('div'); const title = document.createElement('span'); title.textContent = source.name;
+    const amount = document.createElement('b'); amount.textContent = source.available ? `${compact(source.total_tokens)} token · ${usd(source.estimated_cost_usd)}` : 'Belum tersedia';
+    const note = document.createElement('small'); note.textContent = source.error || (source.unknown_routes ? `${source.unknown_routes} rute belum diketahui, dikeluarkan dari total.` : source.window_note || 'Input + output lokal yang tercatat.');
+    card.append(title, amount, note); $('usage-sources').append(card);
+  }
+  if (current) renderNetwork(current, usage);
+}
+
+function renderNetwork(data, usage = data.usage) {
+  const models = data.overview_models || {}, model = data.model || {};
+  const hermesRouter = model.provider === 'custom' && /^http:\/\/(127\.0\.0\.1|localhost):20128(?:\/|$)/.test(model.base_url || '');
+  const opencodeRouter = String(models.opencode || '').startsWith('9router/') || models.opencode_via_router === true;
+  const router = !!data.router?.ok, hermes = !!data.hermes?.running, opencode = !!data.opencode_web?.running;
+  $('net-hermes-model').textContent = model.default || 'Belum dipilih';
+  $('net-opencode-model').textContent = models.opencode || 'Otomatis / per sesi';
+  const sources = usage?.sources || [];
+  $('net-router-model').textContent = sources[0]?.latest_model || 'Belum ada request';
+  $('net-hermes-recent').textContent = `Terakhir terpakai: ${sources[1]?.latest_model || 'belum tercatat'}`;
+  $('net-opencode-recent').textContent = `Terakhir terpakai: ${sources[2]?.latest_model || 'belum tercatat'}`;
+  for (const [name, online] of [['hermes',hermes],['router',router],['opencode',opencode]]) {
+    $(`net-${name}-state`).textContent = online ? 'Aktif' : 'Offline / belum terverifikasi';
+    $(`net-${name}-state`).classList.toggle('online', online);
+  }
+  for (const [name, configured, online] of [['hermes',hermesRouter,hermes],['opencode',opencodeRouter,opencode]]) {
+    const connected = configured && online && router;
+    $(`wire-${name}`).classList.toggle('connected', connected);
+    $(`link-${name}`).textContent = `${name === 'hermes' ? 'Hermes' : 'OpenCode'} → 9Router: ${connected ? 'rute siap' : configured ? 'rute terputus / belum siap' : 'provider langsung / rute lain'}`;
+  }
 }
 
 function renderModels(models = []) {
@@ -185,13 +216,6 @@ function populate(data) {
   $('router-power-state').textContent = routerOnline ? 'RUNNING' : (data.router_service?.enabled ? 'STOPPED' : 'SHUTDOWN');
   $('router-service-logs').hidden = true;
   const model = data.model || {};
-  const is9router = model.provider === 'custom';
-  $('model-status').textContent = model.default || 'Belum dipilih';
-  $('model-detail').textContent = is9router ? '9Router · custom endpoint' : `${model.provider || 'Provider'} · model utama`;
-  pill('key-pill', data.secrets.api_key_set ? 'KEY SET' : 'NO KEY', !!data.secrets.api_key_set);
-  $('route-model').textContent = model.default || 'belum dipilih';
-  $('route-provider').textContent = is9router ? '9Router · custom endpoint' : (model.provider === 'nous' ? 'Nous Portal' : model.provider || 'Provider');
-  $('route-url').textContent = is9router ? model.base_url : 'OAuth provider';
   $('services-status').textContent = data.config_error ? 'Config bermasalah' : (data.files_present.services && data.files_present.config ? 'Lengkap' : 'Perlu dicek');
   $('services-detail').textContent = data.config_error ? data.config_error.slice(0, 70) : 'Unit systemd + config.yaml ditemukan';
   pill('services-pill', data.config_error ? 'CHECK' : 'READY', !data.config_error);
@@ -216,6 +240,7 @@ function populate(data) {
   updateEditor('memory-editor', (data.texts || {}).memory || '');
   updateEditor('user-memory-editor', (data.texts || {}).user_memory || '');
   renderModels(data.router.models || []);
+  renderNetwork(data);
   if ($('usage-period').value === '24h') renderUsage(data.usage);
   renderPrivacy(data.security || {});
   $('last-refresh').textContent = `Diperbarui ${new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}`;
@@ -564,4 +589,10 @@ $('check-update').addEventListener('click', async () => {
     if (data.command) { $('update-command').textContent = data.command; $('update-command').hidden = false; }
   } catch (error) { $('update-status').textContent = `Pemeriksaan gagal: ${error.message}`; }
   finally { $('check-update').disabled = false; }
+});
+
+$('network-motion').addEventListener('click', () => {
+  const paused = document.querySelector('.network-panel').classList.toggle('paused');
+  $('network-motion').setAttribute('aria-pressed', String(paused));
+  $('network-motion').textContent = paused ? 'Lanjutkan animasi' : 'Jeda animasi';
 });

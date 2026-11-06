@@ -17,6 +17,18 @@ HERMIN adalah control panel untuk aplikasi yang dipasang secara terpisah. Repo i
 - Statistik token/cost yang tersedia di database 9Router.
 - Periksa update HERMIN dari GitHub melalui **Layanan native → Update HERMIN**.
 
+## Ringkasan usage dan koneksi
+
+Token, estimasi USD, nilai rupiah dan request tampil di bagian atas. Total menggabungkan seluruh trafik 9Router dengan pemakaian Hermes/OpenCode langsung ke provider lain. Pemakaian yang diarahkan ke 9Router dikeluarkan dari angka langsung agent agar tidak dijumlah dua kali. Sumber yang belum tersedia atau rute yang tidak diketahui ditandai; isi percakapan tidak dibaca untuk perhitungan ini.
+
+Kurs USD/IDR berasal dari referensi harian **Bank Indonesia melalui [Frankfurter](https://frankfurter.dev/)**. Tanggal data ditampilkan, cache diperbarui berkala, dan kurs lama ditandai saat data hari ini belum terbit/koneksi gagal. API kurs hanya menerima permintaan pasangan USD/IDR, tanpa data usage, key, atau pesan pengguna. Ini kurs referensi harian, bukan harga transaksi bank atau kurs intraday.
+
+**Periode:** 9Router memakai timestamp request, OpenCode memakai waktu pesan assistant, sementara Hermes menyimpan akumulasi per model/rute sesi. Pada filter 24 jam/7 hari/30 hari, angka Hermes adalah seluruh akumulasi sesi yang terakhir aktif dalam periode dan bisa mencakup pemakaian sebelum periode itu. Default **Semua waktu** menghindari batas waktu yang tidak sebanding. Biaya nol bisa berarti gratis atau harga belum dicatat; semua angka estimasi lokal, bukan tagihan provider. Token yang ditampilkan adalah input + output tercatat, tanpa menjumlah ulang bucket cache/reasoning terpisah.
+
+Diagram memperlihatkan default Hermes dan OpenCode, serta model terakhir yang dirutekan 9Router (router tidak punya satu default global). Kabel menyala saat rute localhost:20128 dikonfigurasi, layanan agent aktif dan API 9Router terbaca. Ini indikasi kesiapan konfigurasi, bukan packet capture atau bukti request inferensi berhasil. Provider langsung/rute lain/offline ditampilkan dengan kabel terputus. Animasi bisa dijeda dan menghormati reduced motion.
+
+Adapter usage mendukung schema `usageHistory` 9Router, `session_model_usage` Hermes, dan `session_message`/`message` OpenCode. Perubahan schema upstream ditampilkan sebagai data belum tersedia. Plugin/provider dengan nama lain yang menunjuk 9Router di localhost:20128 juga dikecualikan dari usage langsung berdasarkan config saat ini.
+
 ## Kebutuhan
 
 Linux dengan Python **3.11+**, modul `venv`/pip, Git, dan systemd user session. Ubuntu 24.04 dan Fedora adalah target; jalankan sebagai user biasa, bukan root. Node diperlukan oleh 9Router/OpenCode dan pemeriksaan JS, bukan server HERMIN. Gunakan Node 24 LTS untuk panduan stack di bawah.

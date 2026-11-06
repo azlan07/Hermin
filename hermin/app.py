@@ -31,6 +31,7 @@ from privacy_policy import native_config, policy_present, with_policy
 from skill_manager import SkillManager
 from settings import ROOT, STATE, ADMIN_USER
 from updates import check_update
+from overview import Overview, local_router
 
 HERE = Path(__file__).resolve().parent
 SERVICE_UNITS = {
@@ -58,6 +59,7 @@ NOUS_RECOMMENDATIONS = DATA / "cache" / "nous_recommended_cache.json"
 NOUS_METADATA = DATA / "cache" / "endpoint_model_metadata.json"
 CSRF = secrets.token_urlsafe(32)
 SKILLS = SkillManager(ROOT)
+OVERVIEW = Overview(ROOT, Path.home(), ROUTER_USAGE_DB)
 
 
 def admin_token() -> str:
@@ -248,32 +250,17 @@ def get_models(env: dict[str, str], base_url: str) -> dict:
 
 
 def get_usage_stats(period: str = "24h") -> dict:
-    windows = {"24h": timedelta(hours=24), "7d": timedelta(days=7), "30d": timedelta(days=30)}
-    if period not in windows:
-        raise ValueError("Periode statistik tidak valid.")
-    if not ROUTER_USAGE_DB.is_file():
-        return {"available": False, "period": period, "error": "Database pemakaian 9Router belum ditemukan."}
-    cutoff = (datetime.now(timezone.utc) - windows[period]).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    return OVERVIEW.usage(period)
+
+
+def overview_models():
     try:
-        with sqlite3.connect(f"file:{ROUTER_USAGE_DB}?mode=ro", uri=True, timeout=2) as conn:
-            conn.execute("PRAGMA query_only=ON")
-            summary = conn.execute(
-                "SELECT COUNT(*), COALESCE(SUM(promptTokens),0), COALESCE(SUM(completionTokens),0), "
-                "COALESCE(SUM(cost),0) FROM usageHistory WHERE timestamp >= ?", (cutoff,)
-            ).fetchone()
-            top = conn.execute(
-                "SELECT model, SUM(COALESCE(promptTokens,0)+COALESCE(completionTokens,0)) AS total "
-                "FROM usageHistory WHERE timestamp >= ? AND model IS NOT NULL "
-                "GROUP BY model ORDER BY total DESC LIMIT 1", (cutoff,)
-            ).fetchone()
-        prompt = int(summary[1] or 0)
-        completion = int(summary[2] or 0)
-        return {"available": True, "period": period, "requests": int(summary[0]),
-                "prompt_tokens": prompt, "completion_tokens": completion,
-                "total_tokens": prompt + completion, "estimated_cost_usd": round(float(summary[3] or 0), 6),
-                "top_model": str(top[0]) if top else ""}
-    except (OSError, sqlite3.Error):
-        return {"available": False, "period": period, "error": "Statistik 9Router belum dapat dibaca."}
+        config = json.loads(read(OPENCODE_CONFIG))
+        model = str(config.get("model") or "Otomatis / per sesi")
+        provider = config.get("provider", {}).get(model.split("/", 1)[0], {})
+        return {"opencode": model, "opencode_via_router": local_router((provider.get("options") or {}).get("baseURL"))}
+    except (OSError, ValueError, AttributeError):
+        return {"opencode": "Belum dikonfigurasi"}
 
 
 def opencode_model_state() -> dict:
@@ -436,6 +423,7 @@ def state() -> dict:
         "opencode_web": opencode_web_state(),
         "router": models,
         "usage": get_usage_stats(),
+        "overview_models": overview_models(),
         "nous_models": get_nous_models(),
         "security": {"mode": "sandbox" if any("run_sandbox.py" in source for source in
                          (fields.get("ExecStart", ""), dashboard_fields.get("ExecStart", "")))
