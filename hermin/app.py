@@ -472,10 +472,10 @@ class Handler(BaseHTTPRequestHandler):
             return False
         return True
 
-    def _send(self, status: int, value: dict | str, content_type: str = "application/json") -> None:
-        data = value.encode() if isinstance(value, str) else json.dumps(value).encode()
+    def _send(self, status: int, value: dict | str | bytes, content_type: str = "application/json") -> None:
+        data = value if isinstance(value, bytes) else value.encode() if isinstance(value, str) else json.dumps(value).encode()
         self.send_response(status)
-        self.send_header("Content-Type", content_type + "; charset=utf-8")
+        self.send_header("Content-Type", content_type if content_type == "image/png" else content_type + "; charset=utf-8")
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
@@ -491,6 +491,9 @@ class Handler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == "/":
             self._send(200, read(HERE / "index.html"), "text/html")
+        elif path in {"/logo.svg", "/logo.png"}:
+            asset = HERE / "assets" / ("hermin-logo.svg" if path.endswith(".svg") else "hermin-logo.png")
+            self._send(200, asset.read_bytes(), "image/svg+xml" if path.endswith(".svg") else "image/png")
         elif path == "/style.css":
             self._send(200, read(HERE / "style.css"), "text/css")
         elif path == "/app.js":

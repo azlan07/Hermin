@@ -2,6 +2,8 @@
 
 ## Unreleased · main
 
+- Logo HERMIN direkonstruksi menjadi SVG outlined dan PNG HD transparan; dua preview dashboard ditambahkan ke README.
+
 - Ringkasan menempatkan token, estimasi USD/IDR, dan request di bagian atas.
 - Konversi USD/IDR referensi harian BI via Frankfurter dengan tanggal, cache, dan indikator kurs lama.
 - Usage langsung Hermes/OpenCode disandingkan dengan 9Router; rute localhost 9Router dikeluarkan dari hitungan langsung agar tidak dobel.

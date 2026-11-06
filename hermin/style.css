@@ -448,3 +448,5 @@ footer { display: flex; justify-content: space-between; gap: 15px; flex-wrap: wr
   #page-overview .usage-rupiah,#page-overview .usage-metric:last-child { grid-column:1/-1; }
   #page-overview .usage-rupiah strong { font-size:36px; }
 }
+
+.brand-logo { display:block; width:180px; max-width:100%; height:auto; }

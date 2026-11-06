@@ -35,3 +35,16 @@ class InstallTest(unittest.TestCase):
                 self.assertTrue(result['available']);self.assertIn("'/tmp/repo with space/manage.py'",result['command'])
             with patch.object(updates,'STATE',state),patch.object(updates.urllib.request,'urlopen',side_effect=OSError):
                 self.assertIsNone(updates.check_update()['available'])
+
+    def test_logo_is_outlined_vector_and_hd_rgba_png(self):
+        import struct
+        import xml.etree.ElementTree as ET
+        svg=ET.parse(manage.REPO/'hermin/assets/hermin-logo.svg').getroot()
+        tags=[node.tag.split('}')[-1] for node in svg.iter()]
+        self.assertIn('path',tags)
+        self.assertNotIn('text',tags)
+        self.assertNotIn('image',tags)
+        png=(manage.REPO/'hermin/assets/hermin-logo.png').read_bytes()
+        self.assertEqual(png[:8],b'\x89PNG\r\n\x1a\n')
+        self.assertEqual(struct.unpack('>II',png[16:24]),(3024,1008))
+        self.assertEqual(png[25],6)  # RGBA with an alpha channel.

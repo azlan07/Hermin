@@ -17,7 +17,8 @@ import urllib.request
 REPO = Path(__file__).resolve().parent
 RUNTIME_FILES = ('app.py', 'app.js', 'index.html', 'style.css', 'settings.py', 'updates.py',
                  'overview.py', 'privacy_policy.py', 'skill_manager.py', 'skills.js', 'opencode_web.py',
-                 'opencode-web.html', 'opencode-web.js', 'opencode-web.css')
+                 'opencode-web.html', 'opencode-web.js', 'opencode-web.css',
+                 'assets/hermin-logo.svg', 'assets/hermin-logo.png')
 ORIGIN = 'https://github.com/azlan07/Hermin.git'
 
 
@@ -95,6 +96,7 @@ def install(root, port, no_systemd=False, no_start=False):
     try:
         target.mkdir(parents=True, exist_ok=True)
         for name in RUNTIME_FILES:
+            (target / name).parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(REPO / 'hermin' / name, target / name)
         state.mkdir(parents=True, exist_ok=True, mode=0o700)
         revision = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'], capture_output=True, text=True)

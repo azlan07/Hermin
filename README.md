@@ -1,5 +1,7 @@
 # HERMIN · Hermes Admin
 
+<img src="hermin/assets/hermin-logo.svg" alt="HERMIN · Hermes Admin" width="340">
+
 **0.0.1-beta** · © 2026 utiedev
 
 Dashboard lokal untuk mengelola **Hermes Agent, OpenCode v2, dan 9Router** dari satu tempat. Dibuat oleh Azlan. Tampilan hitam-putih, akses localhost, login admin, dan konfirmasi sebelum perubahan.
@@ -16,6 +18,19 @@ HERMIN adalah control panel untuk aplikasi yang dipasang secara terpisah. Repo i
 - Editor Soul, memory, profil pengguna, environment, dan unit layanan.
 - Statistik token/cost yang tersedia di database 9Router.
 - Periksa update HERMIN dari GitHub melalui **Layanan native → Update HERMIN**.
+
+## Preview
+
+![Ringkasan HERMIN dengan usage token dan estimasi biaya](docs/images/hermin-overview.png)
+
+![Diagram koneksi Hermes, 9Router dan OpenCode](docs/images/hermin-connections.png)
+
+### Logo
+
+- [SVG vector asli](hermin/assets/hermin-logo.svg), semua teks berupa path agar tidak bergantung pada font host.
+- [PNG HD transparan 3024 × 1008](hermin/assets/hermin-logo.png), dengan alpha asli, cocok untuk presentasi dan publikasi.
+
+PNG tetap raster dan memiliki batas resolusi; gunakan SVG untuk ukuran bebas. Logo dapat dibangun ulang memakai `python3 scripts/build-logo.py` dengan pycairo dan font Liberation Sans/Noto Sans Mono pada mesin desain. File SVG/PNG hasilnya sudah disertakan, sehingga instalasi HERMIN tidak membutuhkan Cairo maupun font tersebut. Preview di atas adalah tangkapan layar yang diberikan pemilik project dan mungkin menampilkan tampilan sebelum logo vector dipasang.
 
 ## Ringkasan usage dan koneksi
 

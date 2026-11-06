@@ -24,9 +24,14 @@ try:
     else:raise AssertionError('Server did not start')
     token=(root/'hermes/security/hermin-admin-token').read_text().strip()
     headers={'Authorization':'Basic '+base64.b64encode((getpass.getuser()+':'+token).encode()).decode()}
-    for route in ('/','/skills.js','/api/skills','/api/state','/api/update'):
+    for route in ('/','/logo.svg','/logo.png','/skills.js','/api/skills','/api/state','/api/update'):
         with urllib.request.urlopen(urllib.request.Request(url+route,headers=headers),timeout=45) as response:
             assert response.status==200,route
+            if route=='/logo.png':
+                assert response.headers['Content-Type']=='image/png'
+                assert response.read(8)==b'\x89PNG\r\n\x1a\n'
+            elif route=='/logo.svg':
+                assert b'<path' in response.read()
     try:urllib.request.urlopen(urllib.request.Request(url+'/api/action',data=b'{"action":"skill-control"}',headers=headers),timeout=3)
     except urllib.error.HTTPError as error:assert error.code==403
     else:raise AssertionError('CSRF missing')
