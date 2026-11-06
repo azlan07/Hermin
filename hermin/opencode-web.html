@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCode · HERMIN</title><link rel="stylesheet" href="/opencode-web.css"><script src="/opencode-web.js" defer></script></head>
+<body>
+  <header><div><strong>OPENCODE <span>× HERMIN</span></strong><small id="web-status" role="status">Memeriksa layanan lokal…</small></div>
+    <nav aria-label="Kontrol OpenCode">
+      <button id="web-connect">Buka / sambungkan</button><button id="web-external">Tab baru ↗</button>
+      <button id="web-start" hidden>Start</button><button id="web-restart" hidden>Restart</button><button id="web-stop" hidden>Stop</button>
+    </nav>
+  </header>
+  <p id="web-message" role="alert" hidden></p>
+  <div id="web-placeholder"><h1>Workspace OpenCode</h1><p>Layanan lokal di port 4096. Login menggunakan tautan sekali pakai.</p><p>Gunakan tombol Buka / sambungkan untuk memulai. Percakapan tetap memakai data OpenCode yang sudah ada.</p></div>
+  <iframe id="web-frame" title="OpenCode Web" referrerpolicy="no-referrer" hidden></iframe>
+  <dialog id="web-confirm"><h2 id="confirm-title"></h2><p id="confirm-description"></p><div><button id="confirm-no">Batal</button><button id="confirm-yes">Lanjutkan</button></div></dialog>
+</body></html>

@@ -1,0 +1,149 @@
+# HERMIN · Hermes Admin
+
+Dashboard lokal untuk mengelola **Hermes Agent, OpenCode v2, dan 9Router** dari satu tempat. Dibuat oleh Azlan. Tampilan hitam-putih, akses localhost, login admin, dan konfirmasi sebelum perubahan.
+
+HERMIN adalah control panel untuk aplikasi yang dipasang secara terpisah. Repo ini berisi kode HERMIN dan alat setup layanan, tanpa binary agent, akun provider, percakapan, atau API key.
+
+## Fitur
+
+- Start, stop, restart, shutdown/autostart layanan Hermes dan 9Router.
+- Pilih model/combo dari katalog 9Router; daftar Nous Portal membedakan model gratis jika metadata tersedia.
+- Simpan API key 9Router secara lokal dan atur model OpenCode.
+- Buka Hermes, 9Router, dan OpenCode Web; OpenCode menggunakan pairing sekali pakai.
+- Skill manager: pencarian, filter status/aplikasi, aktifkan/pause, validasi ulang, restart Headroom, hapus ke backup, buka/salin lokasi.
+- Editor Soul, memory, profil pengguna, environment, dan unit layanan.
+- Statistik token/cost yang tersedia di database 9Router.
+- Periksa update HERMIN dari GitHub melalui **Layanan native → Update HERMIN**.
+
+## Kebutuhan
+
+Linux dengan Python **3.11+**, modul `venv`/pip, Git, dan systemd user session. Ubuntu 24.04 dan Fedora adalah target; jalankan sebagai user biasa, bukan root. Node diperlukan oleh 9Router/OpenCode dan pemeriksaan JS, bukan server HERMIN. Gunakan Node 24 LTS untuk panduan stack di bawah.
+
+Ubuntu:
+
+```sh
+sudo apt-get update
+sudo apt-get install -y git python3 python3-venv python3-pip curl build-essential
+```
+
+Fedora:
+
+```sh
+sudo dnf install -y git python3 python3-pip curl gcc gcc-c++ make
+```
+
+User server harus mempunyai layanan systemd user. Untuk autostart sesudah reboot tanpa login, administrator dapat menjalankan `sudo loginctl enable-linger "$USER"` sebagai user tujuan. Perintah `systemctl --user show-environment` harus berhasil sebelum instalasi layanan.
+
+## Instalasi HERMIN
+
+Kalau stack sudah berjalan, gunakan root stack yang sekarang. Installer hanya memperbarui file aplikasi HERMIN dan unit `hermin.service`.
+
+```sh
+git clone https://github.com/azlan07/Hermin.git "$HOME/Hermin"
+cd "$HOME/Hermin"
+python3 manage.py install --root "$HOME/server-lokal"
+```
+
+Installer membuat virtual environment sendiri, memasang dependency yang dipin, menjalankan tes, membuat backup, lalu menyalakan dashboard. Port default **1515**; ubah dengan `--port 1516` jika diperlukan. Port yang digunakan aplikasi lain tidak akan dibebaskan otomatis.
+
+Buka **http://127.0.0.1:1515/**. Username adalah user Linux yang menjalankan layanan, password adalah isi file lokal ini:
+
+```sh
+cat "$HOME/server-lokal/hermes/security/hermin-admin-token"
+```
+
+Jangan kirim token ke GitHub atau masukkan ke Soul/memory. Untuk memeriksa stack:
+
+```sh
+python3 manage.py doctor --root "$HOME/server-lokal"
+```
+
+`doctor` memeriksa port dan keberadaan konfigurasi. Setelah hasilnya OK, uji satu percakapan/model nyata di Hermes dan OpenCode. Respons provider bergantung pada akun, kuota, dan ketersediaan model.
+
+### Instalasi tanpa systemd
+
+```sh
+python3 manage.py install --root "$HOME/server-lokal" --no-systemd
+```
+
+Jalankan perintah foreground yang dicetak installer. Kontrol layanan dashboard tetap membutuhkan systemd user; mode ini berguna untuk pengembangan dan pemeriksaan instalasi.
+
+## Setup stack baru
+
+Lihat [panduan setup Hermes, 9Router, dan OpenCode](docs/SETUP.md). Jika aplikasinya sudah terpasang dan berjalan, jangan jalankan ulang langkah pembuatan unit.
+
+Struktur yang dipakai HERMIN:
+
+```text
+~/server-lokal/
+├── hermin/
+│   ├── venv/                 # dependency dashboard
+│   ├── state/                # versi terpasang dan cache
+│   └── backups/              # backup deployment dan editor
+├── hermes/
+│   ├── control-dashboard/    # salinan runtime HERMIN
+│   ├── data/                 # HERMES_HOME: config, .env, sessions, skills
+│   ├── workspace/
+│   └── security/             # token admin dashboard
+├── 9router/
+│   ├── app/                  # source upstream, terpisah dari repo HERMIN
+│   └── data/                 # database, jwt-secret, akun provider
+├── opencode/bin/opencode     # opsional; boleh memakai binary resmi dari PATH
+└── maintenance/backups/skills/  # skill yang dihapus melalui UI
+```
+
+OpenCode tetap menyimpan config/state di direktori resmi user seperti `~/.config/opencode` dan `~/.local/share/opencode`. Jangan memindahkan instalasi agent yang sudah berjalan hanya untuk mengikuti contoh tree ini. Hubungkan home Hermes yang benar ke `hermes/data` bila lokasinya berbeda; gunakan `HERMIN_OPENCODE_BIN` untuk binary OpenCode di lokasi khusus.
+
+## Penggunaan
+
+1. **Model & koneksi:** masukkan base URL `http://127.0.0.1:20128/v1` dan API key yang dibuat di 9Router. Perbarui katalog, pilih model/combo, simpan, lalu buka chat baru.
+2. **Nous Portal:** login melalui `hermes model` dengan `HERMES_HOME` instalasi yang benar. OAuth tetap dikelola Hermes; label gratis memerlukan metadata Portal.
+3. **OpenCode:** konfigurasi provider 9Router terlebih dahulu sesuai panduan setup, lalu pilih model default dari menu OpenCode. Pairing Web berlaku sekali dan tidak boleh dibagikan.
+4. **Skill manager:** klik baris skill untuk melihat detail dan kontrol. Penambahan skill dilakukan melalui agent. Pause mengubah nama file agar tidak dimuat di sesi baru; sesi lama bisa masih menyimpan instruksi. Fitur bawaan 9Router tidak dihapus. Pause Headroom mematikan routing kompresi, bukan prosesnya.
+5. **Soul & memory:** atur perilaku dan konteks, lalu buka sesi baru. Ini instruksi model, bukan pembatas akses OS. Agent native memiliki akses sesuai user Linux-nya.
+6. **Layanan native:** periksa status, log, konfigurasi unit, dan pembaruan HERMIN. Shutdown di menu berarti menghentikan layanan dan menonaktifkan autostart, bukan mematikan komputer.
+
+Tombol **Buka folder** bekerja di komputer yang menjalankan HERMIN. Saat akses melalui SSH, gunakan **Salin lokasi**.
+
+## Update dan pemulihan
+
+```sh
+cd "$HOME/Hermin"
+python3 manage.py check-update --root "$HOME/server-lokal"
+python3 manage.py update --root "$HOME/server-lokal"
+```
+
+Pemeriksaan hanya mengirim permintaan metadata commit ke GitHub. Update mengambil `origin/main` dengan fast-forward, menolak perubahan lokal, lalu menjalankan installer dari source terbaru. Backup dibuat sebelum file runtime/unit diganti. Startup yang gagal memulihkan file sebelumnya. Repo bisa sudah berada pada commit baru saat pemasangan gagal; perbaiki penyebabnya lalu jalankan install lagi.
+
+Data Hermes, konfigurasi OpenCode, dan database 9Router tidak ditimpa updater HERMIN. [Panduan maintenance](docs/MAINTENANCE.md) menjelaskan backup, rollback, dan update ketiga aplikasi. Perubahan upstream bisa memerlukan penyesuaian integrasi; jalankan tes dan doctor sesudah update. HERMIN tidak melakukan update agent secara otomatis.
+
+## Akses server melalui SSH / Tailscale
+
+Listener tetap localhost. Dari laptop:
+
+```sh
+ssh -L 1515:127.0.0.1:1515 -L 9119:127.0.0.1:9119 -L 20128:127.0.0.1:20128 -L 4096:127.0.0.1:4096 USER@HOST_TAILSCALE
+```
+
+Buka URL localhost di laptop. Jika port laptop sudah dipakai, gunakan port lokal alternatif untuk HERMIN, misalnya `-L 1516:127.0.0.1:1515`. Dashboard agent lain tetap perlu diteruskan dengan port yang sama karena tautannya memakai localhost. Tidak perlu membuka port publik.
+
+## Pengembangan dan tes
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m unittest discover -s hermin -p 'test_*.py'
+.venv/bin/python -m unittest discover -s tests -p 'test_*.py'
+for file in hermin/*.js; do node --check "$file"; done
+```
+
+GitHub Actions juga menguji install pada direktori kosong, autentikasi, API, dan CSRF di Ubuntu 24.04. Untuk tes lokal identik:
+
+```sh
+python3 manage.py install --root /tmp/hermin-test-stack --port 18151 --no-systemd
+python3 tests/smoke_install.py /tmp/hermin-test-stack 18151
+```
+
+## Lisensi
+
+[MIT](LICENSE), copyright 2026 Azlan. Hermes, OpenCode, 9Router, PyYAML, dan skill pihak ketiga mengikuti lisensi masing-masing. Source/binary aplikasi tersebut tidak didistribusikan dalam repo ini.

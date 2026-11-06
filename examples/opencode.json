@@ -1,0 +1,13 @@
+{
+  "provider": {
+    "9router": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "9Router",
+      "options": {
+        "baseURL": "http://127.0.0.1:20128/v1",
+        "apiKey": "{env:OPENAI_API_KEY}"
+      },
+      "models": {}
+    }
+  }
+}

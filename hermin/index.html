@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>HERMIN · Native control</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+  <script src="/skills.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="brand"><span class="brand-mark">H</span><div><b>HERMIN</b><small>HERMES ADMIN</small></div></div>
+      <nav aria-label="Navigasi dashboard">
+        <button class="nav-item active" data-page="overview"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> Ringkasan</button>
+        <button class="nav-item" data-page="model"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 12h4l6-7M11 12l6 7"/></svg> Model & koneksi</button>
+        <button class="nav-item" data-page="opencode"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></svg> OpenCode</button>
+        <button class="nav-item" data-page="skills"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z"/></svg> Skill manager</button>
+        <button class="nav-item" data-page="memory"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 5v16M12 5C9 2 4 3 2 4v15c4-2 7-1 10 2 3-3 6-4 10-2V4c-2-1-7-2-10 1Z"/></svg> Soul & memory</button>
+        <button class="nav-item" data-page="privacy"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6l9-4Z"/><path d="m8 12 3 3 5-6"/></svg> Privasi</button>
+        <button class="nav-item" data-page="services"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="7"/><rect x="3" y="14" width="18" height="7"/><path d="M7 6h.01M7 17h.01M11 6h6M11 17h6"/></svg> Layanan native</button>
+        <button class="nav-item" data-page="env"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="8" cy="8" r="5"/><path d="m12 12 9 9m-5-5 3-3m-1 5 3-3"/></svg> Environment</button>
+      </nav>
+      <div class="rail-bottom"><span class="local-dot"></span> LOCAL WORKSPACE<br><small>Native · persetujuan di chat</small></div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div><div class="eyebrow">SERVER LOKAL / HERMES</div><h1 id="page-title">Ringkasan</h1></div>
+        <div class="top-actions"><div class="service-links" aria-label="Buka dashboard layanan"><a class="service-link" href="http://127.0.0.1:9119/" target="_blank" rel="noopener noreferrer" title="Buka dashboard Hermes Agent di tab baru"><span class="service-link-icon hermes-link-icon">H</span><span>Hermes</span><span aria-hidden="true">↗</span></a><a class="service-link" href="/opencode-web?autostart=1" target="_blank" rel="noopener noreferrer" title="Buka OpenCode Web"><span>OpenCode ↗</span></a><a class="service-link" href="http://127.0.0.1:20128/dashboard" target="_blank" rel="noopener noreferrer" title="Buka dashboard 9Router di tab baru"><span class="service-link-icon router-link-icon">9</span><span>9Router</span><span aria-hidden="true">↗</span></a></div><span class="saved-indicator" id="last-refresh">Memuat…</span><button class="icon-button" id="refresh" title="Perbarui status" aria-label="Perbarui status">↻</button></div>
+      </header>
+
+      <div class="notice" id="notice" role="status" hidden></div>
+      <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
+      <section class="page active" id="page-overview">
+        <div class="hero-row">
+          <div class="hero"><div class="hero-kicker">YOUR LOCAL AI WORKBENCH</div><h2>Kontrol penuh.<br><span>Tetap atas izin lo.</span></h2><p>Satu tempat untuk model, layanan, dan cara Hermes bekerja bersama lo.</p><div class="hero-meta"><span class="pulse"></span><span id="hero-state">Memeriksa layanan…</span></div></div>
+          <div class="hero-actions"><button class="button primary" data-action="start" hidden>▶ <span>Start Hermes</span></button><button class="button" data-action="restart" hidden>↻ <span>Restart</span></button><button class="button danger" data-action="stop" hidden>■ <span>Stop</span></button><button class="button danger-outline" data-action="shutdown" hidden>⏻ <span>Shutdown</span></button></div>
+        </div>
+        <div class="stat-grid">
+          <article class="stat-card"><div class="stat-top"><span class="stat-icon violet">H</span><span class="status-pill" id="hermes-pill">—</span></div><div class="stat-label">HERMES NATIVE</div><strong id="hermes-status">Memeriksa</strong><small id="hermes-detail">systemd user service</small></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-icon amber">↗</span><span class="status-pill" id="router-pill">—</span></div><div class="stat-label">9ROUTER API</div><strong id="router-status">Memeriksa</strong><small id="router-detail">127.0.0.1:20128/v1</small></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-icon blue">◈</span><span class="status-pill neutral" id="key-pill">—</span></div><div class="stat-label">MODEL DEFAULT</div><strong id="model-status">—</strong><small id="model-detail">—</small></article>
+          <article class="stat-card"><div class="stat-top"><span class="stat-icon green">▤</span><span class="status-pill neutral" id="services-pill">—</span></div><div class="stat-label">KONFIGURASI</div><strong id="services-status">—</strong><small id="services-detail">Unit systemd & config</small></article>
+        </div>
+        <article class="native-strip"><div><span class="status-pill neutral" id="native-mode">Memeriksa mode</span><p id="native-summary">Memeriksa instruksi privasi Hermes…</p></div><button class="text-button" data-page="privacy">Atur privasi ↗</button></article>
+        <article class="panel dashboard-controls"><div class="panel-heading"><div><div class="eyebrow">POWER CONTROL / 9ROUTER</div><h3>Kontrol 9Router</h3><p>Shutdown menghentikan layanan dan mematikan autostart. Start akan mengaktifkannya kembali.</p></div><span class="status-pill neutral" id="router-power-state">Memeriksa</span></div><div class="service-controls"><button class="button primary" data-router-action="start" hidden>▶ Start</button><button class="button" data-router-action="restart" hidden>↻ Restart</button><button class="button danger" data-router-action="stop" hidden>■ Stop</button><button class="button danger-outline" data-router-action="shutdown" hidden>⏻ Shutdown</button></div></article>
+        <article class="panel usage-panel"><div class="panel-heading"><div><div class="eyebrow">9ROUTER USAGE</div><h3>Konsumsi token & cost</h3></div><div class="usage-controls"><select id="usage-period" class="input" aria-label="Periode pemakaian"><option value="24h">24 jam</option><option value="7d">7 hari</option><option value="30d">30 hari</option></select><button class="icon-button small" id="refresh-usage" title="Muat ulang pemakaian" aria-label="Muat ulang pemakaian">↻</button></div></div><div class="usage-metrics"><div class="usage-metric"><span>Token terpakai</span><strong id="usage-tokens">—</strong><small id="usage-token-exact">Input + output</small></div><div class="usage-metric"><span>Estimasi cost</span><strong id="usage-cost">—</strong><small>USD · bukan tagihan</small></div><div class="usage-metric"><span>Request</span><strong id="usage-requests">—</strong><small>Seluruh trafik 9Router</small></div></div><div class="usage-breakdown"><div class="usage-breakdown-head"><span id="usage-input">Input —</span><span id="usage-output">Output —</span></div><div class="usage-track"><span id="usage-input-bar"></span><span id="usage-output-bar"></span></div></div><div class="usage-foot"><span>Model teratas: <b id="usage-top-model">—</b></span><span id="usage-note">Dihitung dari catatan lokal 9Router.</span></div></article>
+        <div class="content-grid">
+          <article class="panel"><div class="panel-heading"><div><div class="eyebrow">MODEL ROUTING</div><h3>Koneksi aktif</h3></div><button class="text-button" data-page="model">Atur koneksi <span>↗</span></button></div><div class="route-flow"><div class="route-node"><span class="node-dot purple"></span><div><b>Hermes Agent</b><small>Model: <span id="route-model">—</span></small></div></div><div class="route-line"><span>HTTP /v1</span></div><div class="route-node"><span class="node-dot orange"></span><div><b id="route-provider">Custom endpoint</b><small id="route-url">—</small></div></div></div><div class="panel-foot"><span class="shield">◆</span> Koneksi lokal dibatasi ke laptop ini.</div></article>
+          <article class="panel"><div class="panel-heading"><div><div class="eyebrow">AVAILABLE MODELS</div><h3>Model 9Router</h3></div><button class="icon-button small" id="refresh-models" title="Muat ulang model" aria-label="Muat ulang model">↻</button></div><div class="model-count"><strong id="model-count">—</strong><span>model ditemukan</span></div><div class="model-list" id="model-list"><div class="empty-state">Memeriksa endpoint 9Router…</div></div></article>
+        </div>
+        <article class="panel logs-panel"><div class="panel-heading"><div><div class="eyebrow">JURNAL LAYANAN</div><h3>Log Hermes</h3></div><button class="text-button" id="load-logs">Muat log terbaru <span>↻</span></button></div><pre id="logs">Tekan “Muat log terbaru” untuk melihat jurnal layanan.</pre></article>
+      </section>
+
+      <section class="page" id="page-model">
+        <div class="section-intro"><div class="eyebrow">ROUTING & INFERENCE</div><h2>Atur model dan koneksi</h2><p>Pilih 9Router yang berjalan di Fedora atau Nous Portal. Model ID dan URL disimpan di `hermes/data/config.yaml`.</p></div>
+        <div class="editor-layout"><article class="panel form-panel">
+          <div class="quick-switch"><button class="quick-choice" data-provider="custom"><b>9Router</b><small>Pilih dari katalog lokal</small></button><button class="quick-choice" data-provider="nous"><b>Nous Portal</b><small>Login OAuth · free tier</small></button></div>
+          <label class="field-label" for="provider">Provider model</label><select id="provider" class="input"><option value="custom">9Router · OpenAI-compatible</option><option value="nous">Nous Portal · OAuth</option></select>
+          <div id="custom-fields"><label class="field-label" for="base-url">Base URL 9Router</label><div class="input-with-icon"><span>↗</span><input id="base-url" class="input" spellcheck="false"></div><div class="helper">Endpoint default Fedora: `http://127.0.0.1:20128/v1`</div><label class="field-label" for="router-api-key">API key 9Router</label><div class="secret-input-row"><input id="router-api-key" class="input" type="password" autocomplete="new-password" spellcheck="false" placeholder="Masukkan API key 9Router"><button class="button" id="toggle-router-key" type="button" aria-label="Tampilkan API key" aria-pressed="false">Tampilkan</button></div><div class="helper" id="router-key-help">Kosongkan jika tidak ingin mengubah API key yang tersimpan. Key disimpan di <code>hermes/data/.env</code>.</div></div>
+          <label class="field-label" id="model-label" for="model-id">Model / combo tersedia</label><div class="model-input-row"><select id="model-id" class="input"><option value="">Muat katalog 9Router…</option></select><button class="button" id="pick-model">↻ Muat ulang</button></div><label class="free-only-filter" id="nous-free-filter" hidden><input type="checkbox" id="nous-free-only" checked><span>Tampilkan model gratis saja</span></label><div class="helper" id="model-help">Katalog diperbarui otomatis dari 9Router. Combo 9Router tampil bersama model.</div>
+          <div class="form-actions"><button class="button primary" id="save-model">Simpan pengaturan model</button><span class="helper">Setelah model berganti, HERMIN membuka chat baru yang bersih. Riwayat lama tetap tersimpan.</span></div><a class="text-button" id="new-chat-fallback" href="http://127.0.0.1:9119/chat" target="_blank" rel="noopener noreferrer" hidden>Buka chat baru Hermes ↗</a>
+        </article><aside class="panel side-info"><div class="eyebrow">KONEKSI 9ROUTER</div><h3 id="model-connection-title">Mengecek endpoint…</h3><p id="model-connection-copy">Dashboard mencoba membaca katalog model di localhost.</p><button class="button full" id="test-router">Tes koneksi & muat model</button><div class="divider"></div><div class="info-row"><span>API key</span><b id="api-key-status">—</b></div><div class="info-row"><span>Env key</span><code>OPENAI_API_KEY</code></div><div class="info-row"><span>Config</span><code>hermes/data/config.yaml</code></div><div class="tip-box">Untuk OAuth Nous, jalankan <code>hermes model</code> dan ikuti device-code login. Panel ini mengatur provider/model; OAuth tetap dikelola Hermes.</div></aside></div>
+      </section>
+
+      <section class="page" id="page-opencode">
+        <article class="panel opencode-web-panel">
+          <div class="panel-heading"><div><div class="eyebrow">OPENCODE WEB · LOCAL</div><h2>Workspace di HERMIN</h2><p id="opencode-web-summary">Memeriksa layanan port 4096…</p></div><div class="service-controls"><button class="button primary" id="open-opencode-web">Buka OpenCode Web</button><a class="button" href="/opencode-web?autostart=1" target="_blank" rel="noopener noreferrer">Layar penuh ↗</a></div></div>
+          <p class="helper">Login sekali pakai · memakai sesi dan konfigurasi OpenCode lokal. Start, Stop, dan Restart tersedia di workspace. Memuat ulang status HERMIN tidak me-refresh chat.</p>
+          <iframe id="opencode-web-embed" title="Workspace OpenCode" referrerpolicy="no-referrer" hidden></iframe>
+        </article>
+        <div class="section-intro"><div class="eyebrow">OPENCODE / MODEL CONTROL</div><h2>Atur model OpenCode</h2><p>Pilih model langsung dari katalog 9Router dan provider lain yang sudah ada di konfigurasi OpenCode.</p></div>
+        <div class="editor-layout"><article class="panel form-panel opencode-panel">
+          <div class="panel-heading"><div><div class="eyebrow">DEFAULT MODEL</div><h3>Model untuk sesi baru</h3></div><button class="button" id="refresh-opencode" type="button">↻ Muat ulang</button></div>
+          <label class="field-label" for="opencode-main-model">Model utama</label><select id="opencode-main-model" class="input"><option value="">Memuat konfigurasi…</option></select><div class="helper">Model 9Router diambil dari katalog lokal. Model provider lain mengikuti konfigurasi OpenCode.</div>
+          <label class="field-label" for="opencode-small-model">Model ringan</label><select id="opencode-small-model" class="input"><option value="">Ikuti pilihan otomatis OpenCode</option></select><div class="helper">Dipakai OpenCode untuk tugas ringan bila diatur. Biarkan otomatis jika tidak diperlukan.</div>
+          <div class="divider"></div><div class="eyebrow">OVERRIDE AGENT</div>
+          <label class="field-label" for="opencode-agent">Agent</label><select id="opencode-agent" class="input"><option value="">Tidak ada agent khusus</option></select>
+          <label class="field-label" for="opencode-agent-model">Model agent</label><select id="opencode-agent-model" class="input"><option value="">Ikuti model utama</option></select><div class="helper">Agent yang memilih model sendiri bisa tetap memakai model berbeda dari default utama.</div>
+          <div class="form-actions"><button class="button primary" id="save-opencode" type="button" disabled>Simpan model OpenCode</button><span class="helper">Konfigurasi lama dibackup sebelum disimpan.</span></div>
+        </article><aside class="panel side-info"><div class="eyebrow">KONEKSI OPENCODE</div><h3 id="opencode-status">Memeriksa konfigurasi…</h3><p id="opencode-status-copy">Katalog dan konfigurasi akan dimuat saat menu dibuka.</p><div class="divider"></div><div class="info-row"><span>Config</span><code>~/.config/opencode/opencode.json</code></div><div class="info-row"><span>9Router</span><code id="opencode-router-url">—</code></div><div class="tip-box">Perubahan default berlaku pada sesi baru. Sesi OpenCode yang sudah memilih model sendiri atau dijalankan dengan <code>--model</code> dapat tetap memakai pilihan tersebut.</div></aside></div>
+      </section>
+
+      <section class="page" id="page-skills">
+        <div class="skills-heading">
+          <div><div class="eyebrow">Pustaka agent</div><h2>Skill di workspace lo.</h2><p>Cari, periksa, dan atur skill Hermes, OpenCode, serta fitur 9Router.</p></div>
+          <button class="button primary" id="skills-refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></svg><span>Perbarui daftar</span></button>
+        </div>
+        <div class="skills-overview" aria-label="Ringkasan pustaka">
+          <span><b id="skills-total">—</b> terdeteksi</span><span><i class="skill-dot ready" aria-hidden="true"></i><b id="skills-ready">—</b> tersedia / berjalan</span><span><i class="skill-dot paused" aria-hidden="true"></i><b id="skills-paused">—</b> dipause</span><span><i class="skill-dot attention" aria-hidden="true"></i><b id="skills-attention">—</b> perlu dicek</span>
+        </div>
+        <div class="skills-workbench">
+          <div class="skills-apps" role="group" aria-label="Filter aplikasi">
+            <button type="button" data-skill-app="" aria-pressed="true">Semua <span>—</span></button><button type="button" data-skill-app="Hermes" aria-pressed="false">Hermes <span>—</span></button><button type="button" data-skill-app="OpenCode" aria-pressed="false">OpenCode <span>—</span></button><button type="button" data-skill-app="9Router" aria-pressed="false">9Router <span>—</span></button>
+          </div>
+          <div class="skill-filters">
+            <label class="skill-search"><span class="sr-only">Cari skill</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="skills-search" type="search" placeholder="Cari nama, deskripsi, atau lokasi…" autocomplete="off"></label>
+            <label class="skill-status-filter"><span class="sr-only">Filter status</span><select id="skills-status"><option value="">Semua status</option><option value="ready">Tersedia / berjalan</option><option value="paused">Dipause</option><option value="attention">Perlu dicek</option></select></label>
+          </div>
+          <div class="skills-list-meta"><p id="skills-summary" aria-live="polite">Memuat daftar skill…</p><span id="skills-checked">Belum diperiksa</span></div>
+          <p id="skills-warning" role="status" hidden></p>
+          <div id="skills-list" class="skill-list" aria-busy="false"></div>
+        </div>
+        <div class="skills-bottom"><p>Skill baru? Pasang lewat agent masing-masing, lalu perbarui daftar di sini.</p><details class="skills-help"><summary>Cara membaca status dan izin</summary><div><p><b>Tersedia</b> berarti file skill ditemukan dan formatnya terbaca. Status ini tidak menunjukkan apakah model sedang memakainya.</p><p>Pause dan hapus berlaku untuk sesi baru. Percakapan lama masih bisa menyimpan instruksinya. Muat ulang memeriksa file tanpa me-restart agent. Perubahan pada folder bersama berlaku untuk semua agent yang membacanya.</p><p id="skills-scope"></p></div></details></div>
+      </section>
+
+      <section class="page" id="page-memory">
+        <div class="section-intro"><div class="eyebrow">PERSONALITY / CONTEXT / TRUST</div><h2>Kenal lo. Hormati batas lo.</h2><p>Atur perilaku dan konteks Hermes tanpa mengubah aplikasi. Semua penyimpanan membuat backup.</p></div>
+        <div class="notice memory-notice"><b>Mulai chat baru setelah mengubah instruksi.</b> Sesi yang sudah berjalan dapat menyimpan konteks lama. Jangan menyimpan token, password, atau kunci di dokumen ini.</div>
+        <div class="memory-tabs" role="tablist" aria-label="Dokumen Hermes">
+          <button id="tab-soul" role="tab" aria-selected="true" aria-controls="document-soul" data-document="soul">01 / SOUL.md <span>Perilaku & privasi</span></button>
+          <button id="tab-memory" role="tab" aria-selected="false" aria-controls="document-memory" data-document="memory" tabindex="-1">02 / MEMORY.md <span>Konteks teknis</span></button>
+          <button id="tab-user-memory" role="tab" aria-selected="false" aria-controls="document-user-memory" data-document="user-memory" tabindex="-1">03 / USER.md <span>Tentang lo</span></button>
+        </div>
+        <div class="memory-grid">
+          <article class="panel code-panel" id="document-soul" role="tabpanel" aria-labelledby="tab-soul"><div class="code-toolbar"><div><b>SOUL.md</b><small>Kepribadian, cara bekerja, dan aturan persetujuan akses.</small></div><button class="button primary" data-save-text="soul">Simpan Soul</button></div><label class="sr-only" for="soul-editor">Isi SOUL.md</label><textarea class="code-editor memory-editor" id="soul-editor" spellcheck="false"></textarea><div class="editor-status"><span id="soul-save-state">Tersimpan</span><span id="soul-count">0 karakter</span></div></article>
+          <article class="panel code-panel" id="document-memory" role="tabpanel" aria-labelledby="tab-memory" hidden><div class="code-toolbar"><div><b>MEMORY.md</b><small>Fakta teknis yang relevan lintas sesi; hindari catatan setup usang.</small></div><button class="button primary" data-save-text="memory">Simpan memory</button></div><label class="sr-only" for="memory-editor">Isi MEMORY.md</label><textarea class="code-editor memory-editor" id="memory-editor" spellcheck="false"></textarea><div class="editor-status"><span id="memory-save-state">Tersimpan</span><span id="memory-count">0 karakter</span></div></article>
+          <article class="panel code-panel" id="document-user-memory" role="tabpanel" aria-labelledby="tab-user-memory" hidden><div class="code-toolbar"><div><b>USER.md</b><small>Identitas, preferensi komunikasi, dan batas pribadi.</small></div><button class="button primary" data-save-text="user_memory">Simpan profil</button></div><label class="sr-only" for="user-memory-editor">Isi USER.md</label><textarea class="code-editor memory-editor" id="user-memory-editor" spellcheck="false"></textarea><div class="editor-status"><span id="user-memory-save-state">Tersimpan</span><span id="user-memory-count">0 karakter</span></div></article>
+        </div>
+        <div class="memory-footnote"><span>Perubahan belum disimpan bertahan saat status diperbarui.</span><button class="text-button" data-page="privacy">Lihat cara privasi bekerja ↗</button></div>
+      </section>
+
+      <section class="page" id="page-privacy">
+        <div class="section-intro"><div class="eyebrow">PRIVACY / HUMAN IN CONTROL</div><h2>Native, dengan persetujuan.</h2><p>Persetujuan diberikan di percakapan Hermes. Tidak perlu memasang folder atau mengelola izin sesi dari HERMIN.</p></div>
+        <article class="panel privacy-hero"><span class="status-pill" id="privacy-mode">Memeriksa mode</span><h3>Hermes harus bertanya sebelum bertindak.</h3><p>Termasuk melihat isi folder, membaca atau mengubah file, menjalankan perintah, mengontrol aplikasi, koneksi layanan, dan instalasi.</p><div class="privacy-limit"><b>Instruksi perilaku, bukan pembatas OS.</b> Proses native memiliki akses sesuai akun Fedora yang menjalankannya. Soul dan memory mengarahkan perilaku model; keduanya tidak menjamin semua akses akan dicegah.</div></article>
+        <div class="privacy-steps">
+          <article class="panel"><span class="step-number">01</span><h3>Jelaskan aksesnya</h3><p>Tujuan, path atau target, jenis akses, tindakan yang akan dilakukan, dan dampaknya.</p></article>
+          <article class="panel"><span class="step-number">02</span><h3>Tunggu jawaban lo</h3><p>Tanpa persetujuan eksplisit, Hermes berhenti. Izin lama tidak otomatis berlaku di sesi berikutnya.</p></article>
+          <article class="panel"><span class="step-number">03</span><h3>Kerjakan sesuai cakupan</h3><p>Target atau tindakan berubah? Tanya lagi. Instalasi dan operasi sensitif perlu konfirmasi terpisah.</p></article>
+        </div>
+        <article class="panel privacy-settings"><div class="panel-heading"><div><div class="eyebrow">PENGATURAN AKTIF</div><h3>Pengaman bawaan Hermes</h3></div><button class="button" data-page="memory">Edit Soul & memory ↗</button></div>
+          <dl class="privacy-settings-list"><div><dt>Perintah berisiko</dt><dd id="privacy-approval">—</dd></div><div><dt>Instalasi otomatis</dt><dd id="privacy-install">—</dd></div><div><dt>Redaksi rahasia</dt><dd id="privacy-secrets">—</dd></div><div><dt>Instruksi di tiga dokumen</dt><dd id="privacy-documents">—</dd></div></dl>
+          <p class="helper">Mode manual meminta konfirmasi untuk perintah yang dianggap berbahaya. Permintaan izin sebelum akses lain berasal dari instruksi Soul/memory.</p>
+          <div class="privacy-runtime"><b>Agar Hermes bisa berjalan</b><p>Membaca konfigurasi, Soul/memory dan kredensial model terpilih, menulis state/log sendiri, serta inferensi percakapan tetap otomatis. Akses file pribadi dan instalasi tidak termasuk pengecualian ini.</p></div>
+          <div class="form-actions"><button class="button primary" id="restore-privacy">Terapkan ulang aturan privasi</button><span class="helper">Backup dibuat. Catatan di luar blok HERMIN dipertahankan.</span></div>
+        </article>
+      </section>
+
+      <section class="page" id="page-services">
+        <article class="panel privacy-settings"><div class="panel-heading"><div><h3>Update HERMIN</h3><p>Periksa versi dari azlan07/Hermin di GitHub.</p></div><button class="button" id="check-update">Periksa pembaruan</button></div><p id="update-status" role="status">Pemeriksaan dilakukan saat lo menekan tombol.</p><code id="update-command" class="skill-path" hidden></code><p class="helper">Jalankan perintah yang ditampilkan di terminal. Installer membuat backup dan memulai ulang HERMIN. Aplikasi agent diperbarui lewat updater resminya masing-masing.</p></article>
+        <div class="section-intro"><div class="eyebrow">SERVICE DEFINITION</div><h2>Layanan native</h2><p>Edit unit systemd user. HERMIN membuat backup, memvalidasi, dan memuat ulang daemon setelah disimpan.</p></div>
+        <article class="panel"><div class="panel-heading"><div><div class="eyebrow">HERMES SYSTEMD</div><h3>Gateway + dashboard</h3></div><div class="service-controls"><button class="button primary" data-action="start" hidden>Start</button><button class="button" data-action="restart" hidden>Restart</button><button class="button danger" data-action="stop" hidden>Stop</button><button class="button danger-outline" data-action="shutdown" hidden>Shutdown</button><button class="button" data-action="logs">Lihat log</button></div></div></article>
+        <article class="panel"><div class="panel-heading"><div><div class="eyebrow">9ROUTER SYSTEMD</div><h3 id="router-service-state">Memeriksa…</h3></div><div class="service-controls"><button class="button primary" data-router-action="start" hidden>Start</button><button class="button" data-router-action="restart" hidden>Restart</button><button class="button danger" data-router-action="stop" hidden>Stop</button><button class="button danger-outline" data-router-action="shutdown" hidden>Shutdown</button><button class="button" data-router-action="logs">Lihat log</button></div></div><pre id="router-service-logs" hidden></pre></article>
+        <article class="panel code-panel"><div class="code-toolbar"><div><b>hermes-gateway.service</b><small>~/.config/systemd/user/</small></div><button class="button primary" data-save-service="hermes">Simpan &amp; validasi</button></div><textarea class="code-editor" id="service-hermes-editor" spellcheck="false" aria-label="Edit hermes-gateway.service"></textarea></article>
+        <article class="panel code-panel"><div class="code-toolbar"><div><b>hermes-dashboard.service</b><small>~/.config/systemd/user/</small></div><button class="button primary" data-save-service="dashboard">Simpan &amp; validasi</button></div><textarea class="code-editor" id="service-dashboard-editor" spellcheck="false" aria-label="Edit hermes-dashboard.service"></textarea></article>
+        <article class="panel code-panel"><div class="code-toolbar"><div><b>9router.service</b><small>~/.config/systemd/user/</small></div><button class="button primary" data-save-service="router">Simpan &amp; validasi</button></div><textarea class="code-editor" id="service-router-editor" spellcheck="false" aria-label="Edit 9router.service"></textarea></article>
+      </section>
+
+      <section class="page" id="page-env">
+        <div class="section-intro"><div class="eyebrow">SECRETS & ENVIRONMENT</div><h2>Environment Hermes</h2><p>File `.env` menyediakan API key 9Router ke Hermes. Isinya disembunyikan sampai kamu membuka editor rahasia secara sadar.</p></div>
+        <div class="env-top-grid"><article class="panel secret-card"><div class="secret-mark">⚿</div><div class="eyebrow">OPENAI_API_KEY</div><h3 id="env-key-title">—</h3><p>Dipakai sebagai API key untuk endpoint 9Router. Nilainya tidak ditampilkan di ringkasan.</p><div class="secret-actions"><button class="button" id="reveal-env">Buka editor .env penuh</button><button class="text-button danger-text" id="hide-env" hidden>Kunci kembali</button></div></article><article class="panel env-card"><div class="eyebrow">BASE URL DARI ENV</div><h3 id="env-base-url">—</h3><p>Untuk provider custom, URL aktif dibaca dari `config.yaml`. Editor model di atas adalah sumber utamanya.</p><button class="text-button" data-page="model">Atur model & URL <span>↗</span></button></article></div>
+        <article class="panel code-panel env-editor-panel" id="env-editor-panel" hidden><div class="code-toolbar"><div><b>hermes/data/.env</b><small>File sensitif · mode 600</small></div><div><span class="file-badge secret-badge">SECRET</span><button class="button primary" id="save-env">Simpan environment</button></div></div><textarea class="code-editor env-editor" id="env-editor" spellcheck="false" aria-label="Edit hermes/data/.env"></textarea><div class="panel-foot"><span class="shield">◆</span> Backup dibuat dengan izin 600. Jangan salin isi file ini ke chat atau log.</div></article>
+        <div class="notice warning-note"><b>Catatan:</b> variabel kosong tidak akan menimpa nilai yang ada. Setelah mengubah .env, restart layanan Hermes agar perubahan dipakai.</div>
+      </section>
+      <footer><span>HERMIN · HERMES ADMIN</span><span>NATIVE / HUMAN IN CONTROL</span></footer>
+    </main>
+  </div>
+  <div class="modal-backdrop" id="confirm-modal" hidden><section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="modal-close" id="modal-close" aria-label="Tutup">×</button><div class="modal-mark" id="modal-mark">?</div><div class="eyebrow">KONFIRMASI</div><h2 id="modal-title">Lanjutkan?</h2><p id="modal-copy"></p><div class="modal-actions"><button class="button" id="modal-cancel">Batal</button><button class="button primary" id="modal-confirm">Lanjutkan</button></div></section></div>
+</body>
+</html>
