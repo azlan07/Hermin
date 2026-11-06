@@ -10,6 +10,7 @@ import socket
 import subprocess
 import sys
 import time
+import tarfile
 import urllib.error
 import urllib.request
 
@@ -99,7 +100,7 @@ def install(root, port, no_systemd=False, no_start=False):
         revision = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'], capture_output=True, text=True)
         metadata = {'revision': revision.stdout.strip() if revision.returncode == 0 else 'unversioned',
                     'repository': str(REPO), 'python': sys.executable, 'root': str(root), 'port': port,
-                    'no_systemd': no_systemd, 'no_start': no_start}
+                    'no_systemd': no_systemd, 'no_start': no_start, 'version': (REPO/'VERSION').read_text().strip()}
         (state / 'installation.json').write_text(json.dumps(metadata, indent=2))
         if not no_systemd:
             unit.parent.mkdir(parents=True, exist_ok=True)
@@ -173,11 +174,15 @@ def update(root):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['install', 'doctor', 'check-update', 'update'])
+    parser.add_argument('--version', action='version', version=(REPO/'VERSION').read_text().strip())
+    parser.add_argument('action', choices=['install', 'doctor', 'check-update', 'update', 'backup', 'restore'])
     parser.add_argument('--root', type=Path, default=Path.home() / 'server-lokal')
     parser.add_argument('--port', type=int, default=1515)
     parser.add_argument('--no-systemd', action='store_true', help='Install for manual foreground execution')
     parser.add_argument('--no-start', action='store_true', help='Write unit without enabling/restarting it')
+    parser.add_argument('--archive', type=Path, help='Arsip lokal untuk restore')
+    parser.add_argument('--output', type=Path, help='Lokasi arsip backup lokal baru')
+    parser.add_argument('--overwrite', action='store_true', help='Izinkan restore menimpa file; salinan pemulihan tetap dibuat')
     args = parser.parse_args(); root = args.root.expanduser().resolve()
     if not 1024 <= args.port <= 65535:
         parser.error('Port harus antara 1024 dan 65535.')
@@ -185,12 +190,25 @@ def main():
         if args.action == 'install': install(root, args.port, args.no_systemd, args.no_start)
         elif args.action == 'doctor': return doctor(root)
         elif args.action == 'update': update(root)
+        elif args.action in ('backup', 'restore'):
+            from backup import backup, restore, stopped_services
+            if args.no_systemd:
+                raise ValueError('Backup/restore CLI memerlukan layanan user systemd. Hentikan instans manual dan gunakan API Python hanya untuk tes offline.')
+            if args.action == 'restore' and not args.archive:
+                raise ValueError('Isi --archive dengan arsip backup lokal.')
+            with stopped_services():
+                if args.action == 'backup':
+                    print('Backup lokal privat:', backup(root, Path.home(), args.output))
+                else:
+                    recovery,count=restore(root, Path.home(), args.archive, args.overwrite)
+                    print(f'{count} file dipulihkan. Backup sebelum restore: {recovery}')
+            print('Layanan yang sebelumnya aktif sudah dinyalakan kembali. Jalankan doctor dan uji satu chat.')
         else:
             os.environ['HERMIN_ROOT'] = str(root)
             sys.path.insert(0, str(REPO / 'hermin'))
             from updates import check_update
             print(json.dumps(check_update(), indent=2))
-    except (OSError, ValueError, subprocess.SubprocessError) as error:
+    except (OSError, ValueError, KeyError, RuntimeError, tarfile.TarError, subprocess.SubprocessError) as error:
         print(f'Gagal: {error}', file=sys.stderr); return 1
     return 0
 

@@ -1,5 +1,7 @@
 # HERMIN · Hermes Admin
 
+**0.0.1-beta** · © 2026 utiedev
+
 Dashboard lokal untuk mengelola **Hermes Agent, OpenCode v2, dan 9Router** dari satu tempat. Dibuat oleh Azlan. Tampilan hitam-putih, akses localhost, login admin, dan konfirmasi sebelum perubahan.
 
 HERMIN adalah control panel untuk aplikasi yang dipasang secara terpisah. Repo ini berisi kode HERMIN dan alat setup layanan, tanpa binary agent, akun provider, percakapan, atau API key.
@@ -104,6 +106,30 @@ OpenCode tetap menyimpan config/state di direktori resmi user seperti `~/.config
 6. **Layanan native:** periksa status, log, konfigurasi unit, dan pembaruan HERMIN. Shutdown di menu berarti menghentikan layanan dan menonaktifkan autostart, bukan mematikan komputer.
 
 Tombol **Buka folder** bekerja di komputer yang menjalankan HERMIN. Saat akses melalui SSH, gunakan **Salin lokasi**.
+
+## Backup dan restore lokal
+
+Backup mencakup provider/API key dan OAuth yang tersimpan, config, Soul/personality, memory, skill, percakapan dan state aplikasi. Arsip dibuat **lokal**, bukan di GitHub. File berizin 0600; arsip tidak dienkripsi dan harus diperlakukan seperti kumpulan password.
+
+```sh
+cd "$HOME/Hermin"
+python3 manage.py backup --root "$HOME/server-lokal"
+```
+
+Perintah mencetak path arsip `.tar.gz` yang benar. Lokasi default `~/server-lokal/hermin/backups/`. Untuk lokasi lain, gunakan `--output /path/privat/backup.tar.gz`. Perintah menolak menimpa arsip yang sudah ada. Kelima layanan aktif dihentikan sementara agar file/database konsisten dan dinyalakan kembali sesudah selesai atau gagal. Jangan jalankan backup saat agent sedang mengerjakan tugas penting; instans manual harus dihentikan sendiri.
+
+Pada mesin tujuan, clone dan install HERMIN mengikuti README, serta pasang runtime resmi ketiga aplikasi mengikuti [setup stack](docs/SETUP.md). Salin arsip secara privat dengan SSH/SCP. Lalu:
+
+```sh
+python3 manage.py restore --root "$HOME/server-lokal" --archive /path/privat/backup.tar.gz
+python3 manage.py doctor --root "$HOME/server-lokal"
+```
+
+Untuk instalasi yang sudah mempunyai file konfigurasi, tinjau arsip lalu tambahkan `--overwrite`. Salinan file yang ditimpa disimpan pada `hermin/backups/pre-restore-*/` dan dipulihkan jika penulisan gagal. Restore memverifikasi checksum dan menolak traversal path, link arsip, dan file khusus. Path home/root lama dalam config teks disesuaikan dengan lokasi baru. Unit systemd dibuat ulang lewat panduan setup, bukan mengeksekusi unit dari backup.
+
+Backup **tidak menyertakan runtime/binary, virtual environment, node_modules, source aplikasi agent, cache, log, atau token login HERMIN**. Token dashboard mesin tujuan tetap milik instalasi baru. Environment/binary Fedora tidak portabel langsung ke Ubuntu; runtime resmi perlu dipasang satu kali sebelum data hasil restore dapat digunakan. Login OAuth tertentu bisa meminta autentikasi ulang pada mesin lain. File proyek di luar home data agent tidak ikut disalin.
+
+Penambahan arsip ke Git dicegah oleh `.gitignore`; jangan gunakan `git add -f` atau mengunggahnya sebagai release asset. Lihat [cakupan dan pemulihan](docs/BACKUP.md).
 
 ## Update dan pemulihan
 
