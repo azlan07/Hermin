@@ -8,6 +8,25 @@ Dashboard lokal untuk mengelola **Hermes Agent, OpenCode v2, dan 9Router** dari 
 
 HERMIN adalah control panel untuk aplikasi yang dipasang secara terpisah. Repo ini berisi kode HERMIN dan alat setup layanan, tanpa binary agent, akun provider, percakapan, atau API key.
 
+## Mulai di sini
+
+**Clone repo dan `manage.py install` hanya memasang HERMIN.** Node.js, Hermes, OpenCode v2, dan 9Router perlu dipasang tersendiri. Lolos tes HERMIN tidak berarti ketiga aplikasi sudah terpasang.
+
+Untuk mesin baru ikuti **[panduan setup berurutan](docs/SETUP.md)** dari awal:
+
+| Urutan | Yang dipasang/disiapkan | Lokasi |
+|---|---|---|
+| 1 | Paket OS dan Node/npm | runtime resmi per user |
+| 2 | Source HERMIN | `~/server-lokal/hermin/repo` |
+| 3 | Hermes melalui installer resmi dengan `--dir` dan `--hermes-home` | aplikasi `hermes/app`, data `hermes/data` |
+| 4 | 9Router melalui build source resmi | aplikasi `9router/app`, provider/database `9router/data` |
+| 5 | OpenCode v2 `@opencode/cli`, npm prefix khusus | `opencode/bin/opencode` dan `opencode/lib` |
+| 6 | Unit layanan dan dashboard HERMIN | systemd user + `hermes/control-dashboard` |
+| 7 | Konfigurasi provider/model **atau** restore backup lokal | data milik user |
+| 8 | Start, doctor, tes chat, dan SSH/Tailscale | localhost |
+
+Semua path aplikasi/data pada tabel relatif terhadap `~/server-lokal`. Repo source dipisahkan dari data runtime agar akun/provider tidak ikut Git. Jika sudah mempunyai clone di `~/server-lokal` atau lokasi lain, pertahankan dan gunakan direktori aktual itu, bukan menyalin contoh path baru secara membabi buta. Lihat [panduan instalasi yang sudah ada](docs/SETUP.md#instalasi-yang-sudah-ada).
+
 ## Fitur
 
 - Start, stop, restart, shutdown/autostart layanan Hermes dan 9Router.
@@ -65,11 +84,12 @@ User server harus mempunyai layanan systemd user. Untuk autostart sesudah reboot
 
 ## Instalasi HERMIN
 
-Kalau stack sudah berjalan, gunakan root stack yang sekarang. Installer hanya memperbarui file aplikasi HERMIN dan unit `hermin.service`.
+Bagian ini khusus memasang dashboard setelah runtime tersedia. Pada mesin baru, ikuti [urutan setup lengkap](docs/SETUP.md) terlebih dahulu. Kalau stack sudah berjalan, gunakan root stack dan lokasi clone yang sekarang. Installer hanya memperbarui file aplikasi HERMIN dan unit `hermin.service`.
 
 ```sh
-git clone https://github.com/azlan07/Hermin.git "$HOME/Hermin"
-cd "$HOME/Hermin"
+mkdir -p "$HOME/server-lokal/hermin"
+git clone https://github.com/azlan07/Hermin.git "$HOME/server-lokal/hermin/repo"
+cd "$HOME/server-lokal/hermin/repo"
 python3 manage.py install --root "$HOME/server-lokal"
 ```
 
@@ -106,10 +126,12 @@ Struktur yang dipakai HERMIN:
 ```text
 ~/server-lokal/
 ├── hermin/
+│   ├── repo/                 # clone source HERMIN (instalasi baru)
 │   ├── venv/                 # dependency dashboard
 │   ├── state/                # versi terpasang dan cache
 │   └── backups/              # backup deployment dan editor
 ├── hermes/
+│   ├── app/                  # instalasi resmi Hermes
 │   ├── control-dashboard/    # salinan runtime HERMIN
 │   ├── data/                 # HERMES_HOME: config, .env, sessions, skills
 │   ├── workspace/
@@ -117,7 +139,7 @@ Struktur yang dipakai HERMIN:
 ├── 9router/
 │   ├── app/                  # source upstream, terpisah dari repo HERMIN
 │   └── data/                 # database, jwt-secret, akun provider
-├── opencode/bin/opencode     # opsional; boleh memakai binary resmi dari PATH
+├── opencode/bin/opencode     # npm prefix resmi; bisa juga executable resmi dari PATH
 └── maintenance/backups/skills/  # skill yang dihapus melalui UI
 ```
 
@@ -136,10 +158,12 @@ Tombol **Buka folder** bekerja di komputer yang menjalankan HERMIN. Saat akses m
 
 ## Backup dan restore lokal
 
+Perintah di bawah memakai lokasi clone yang disarankan untuk instalasi baru. Jika clone berada di tempat lain, jalankan dari lokasi aktual yang berisi `manage.py`.
+
 Backup mencakup provider/API key dan OAuth yang tersimpan, config, Soul/personality, memory, skill, percakapan dan state aplikasi. Arsip dibuat **lokal**, bukan di GitHub. File berizin 0600; arsip tidak dienkripsi dan harus diperlakukan seperti kumpulan password.
 
 ```sh
-cd "$HOME/Hermin"
+cd "$HOME/server-lokal/hermin/repo"
 python3 manage.py backup --root "$HOME/server-lokal"
 ```
 
@@ -160,8 +184,10 @@ Penambahan arsip ke Git dicegah oleh `.gitignore`; jangan gunakan `git add -f` a
 
 ## Update dan pemulihan
 
+Gunakan lokasi clone aktual jika berbeda dari contoh berikut.
+
 ```sh
-cd "$HOME/Hermin"
+cd "$HOME/server-lokal/hermin/repo"
 python3 manage.py check-update --root "$HOME/server-lokal"
 python3 manage.py update --root "$HOME/server-lokal"
 ```

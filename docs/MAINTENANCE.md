@@ -64,10 +64,12 @@ Jangan menginstal `opencode-ai` v1 ke command yang sama dengan v2 `@opencode/cli
 
 ## HERMIN
 
+Contoh berikut memakai lokasi clone untuk instalasi baru. Clone lama di lokasi lain tetap dipakai dari lokasi aktualnya.
+
 Menu Layanan native dapat memeriksa commit `main` di GitHub. Pembaruan diterapkan dari terminal:
 
 ```sh
-cd "$HOME/Hermin"
+cd "$HOME/server-lokal/hermin/repo"
 python3 manage.py update --root "$HOME/server-lokal"
 ```
 

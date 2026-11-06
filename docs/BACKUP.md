@@ -17,7 +17,7 @@ Secret yang disimpan di tempat lain, password manager, keyring OS, custom root d
 
 1. Selesaikan pekerjaan agent; backup dengan `python3 manage.py backup`.
 2. Simpan arsip secara privat dan pindahkan lewat SSH/SCP ke mesin tujuan. Jangan kirim ke AI/provider atau GitHub.
-3. Pada tujuan, pasang runtime resmi, clone HERMIN, install, dan konfigurasi unit sesuai SETUP. Jangan login/model setup baru bila ingin memakai data lama.
+3. Pada tujuan, ikuti [SETUP](SETUP.md) sampai runtime resmi, clone HERMIN, unit, dan dashboard terpasang. Jangan login/model setup baru bila ingin memakai data lama.
 4. Restore arsip ke root tujuan. `--overwrite` diperlukan jika ada file tujuan yang sudah ada; file itu tetap dicadangkan sebelum diganti.
 5. Buat/periksa kembali unit dan lokasi executable. Jika aplikasi baru belum memiliki unit, restore tidak memasang atau menyalakannya otomatis.
 6. Jalankan `doctor`, nyalakan layanan yang diperlukan, tes model, tools dan satu chat. Periksa path plugin/proyek lama yang mungkin tetap tersimpan di database sesi.

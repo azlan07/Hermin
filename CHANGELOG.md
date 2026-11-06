@@ -2,6 +2,8 @@
 
 ## Unreleased · main
 
+- Panduan setup resmi diperjelas: path Hermes eksplisit, npm prefix OpenCode v2, source 9Router, PATH/nvm/systemd, pemisahan repo/data, dan alur setup baru versus restore.
+
 - Logo HERMIN direkonstruksi menjadi SVG outlined dan PNG HD transparan; dua preview dashboard ditambahkan ke README.
 
 - Ringkasan menempatkan token, estimasi USD/IDR, dan request di bagian atas.
